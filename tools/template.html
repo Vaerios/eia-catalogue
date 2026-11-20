@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}（2021版 → 2027版）</title>
+<meta name="description" content="《建设项目环境影响评价分类管理名录》2021年版与2027年版逐项对照：191个行业项目的报告书、报告表、登记表和敏感区条件变化，可搜索、可按标签筛选。">
+<meta name="theme-color" content="#163C5B">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="2021年版与2027年版逐项对照，可搜索、可筛选，旧版删去与新版新增一目了然。">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+<script>
+(function(){var d=document.documentElement;try{var t=localStorage.getItem('eia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t);if(localStorage.getItem('eia-diff')==='off')d.classList.add('nodiff')}catch(e){}})();
+</script>
+</head>
+<body id="top">
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <a class="brand" href="#top">环评名录对照</a>
+  <label class="tsearch js-only"><span class="sr">搜索</span>
+    <input type="search" data-search placeholder="搜索项目、项号、关键词" autocomplete="off" spellcheck="false">
+  </label>
+  <div class="tools js-only">
+    <label class="switch"><input type="checkbox" id="diffToggle" checked><span class="track" aria-hidden="true"></span><span>标出差异</span></label>
+    <button type="button" class="iconbtn" id="themeBtn" aria-label="切换明暗主题" title="切换明暗主题">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+    </button>
+  </div>
+</header>
+<nav class="pills js-only" aria-label="章节">{{PILLS}}</nav>
+
+<section class="hero">
+  <div class="hero-in">
+    <div class="hero-text">
+      <h1>{{TITLE_HTML}}</h1>
+      <ul class="meta">{{SUBTITLE}}</ul>
+      <p class="intro">{{INTRO}}</p>
+      <div class="finder js-only" id="heroSearch">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" data-search aria-label="搜索项目、项号或关键词" placeholder="输入项目名称、项号或关键词，如：风力发电、污水处理、157" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </div>
+      <div class="suggest js-only"><span>例如</span>
+        <button type="button" data-q="风力发电">风力发电</button><button type="button" data-q="储能">储能</button>
+        <button type="button" data-q="污水">污水</button><button type="button" data-q="太阳能">太阳能</button>
+        <button type="button" data-q="高速公路">高速公路</button><button type="button" data-q="核设施">核设施</button>
+      </div>
+      <p class="src"><span>原文</span>{{LINKS}}</p>
+    </div>
+    <figure class="spec" aria-label="对照示例：新120 污水处理及其再生利用">
+      <div class="sheet">{{SPECIMEN}}</div>
+      <figcaption>删除线为旧版条件，荧光笔为新版改动。下方 {{TOTAL}} 个行业条目都按此方式对照。</figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="status js-only" id="status" role="status" aria-live="polite" hidden>
+  <span id="statusText"></span>
+  <button type="button" id="clearBtn">清除搜索和筛选</button>
+</div>
+
+<div class="shell">
+  <aside class="side js-only" aria-label="目录"><ol>{{SIDENAV}}</ol></aside>
+  <main id="main" tabindex="-1">
+    {{MAIN}}
+    <div class="empty" id="empty" hidden>
+      <p><strong>没有找到匹配的条目。</strong></p>
+      <p>试试更短的关键词，或直接输入新版项号（如 157）。多个词用空格分隔时，需要同时包含。</p>
+    </div>
+  </main>
+</div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <p class="srcs"><span>原文</span>{{LINKS}}</p>
+    <p>{{SOURCE_TAIL}}</p>
+    <p class="fine">本页是对照整理，便于查阅，不具法律效力；具体适用以生态环境部发布的官方文本为准。</p>
+  </div>
+</footer>
+<script src="assets/app.js" defer></script>
+</body>
+</html>
