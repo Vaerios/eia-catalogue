@@ -97,6 +97,7 @@
         : t + '的行业项目：' + shownT + ' / ' + tiered.length + ' 项';
     }
     setStatusHeight();
+    spyRefresh();
   }
   function schedule() { clearTimeout(timer); timer = setTimeout(apply, 120); }
 
@@ -142,33 +143,56 @@
     var target = shownTop ? $('.tsearch input') : $('.finder input'); target.focus(); target.select();
   });
 
-  /* ── 目录当前位置 ── */
+  /* ── 目录当前位置 ──
+     用 IntersectionObserver 观察各小节标题，滚动期间不跑任何脚本；
+     章节标签栏只在“当前章节变化”时横向移动一次，绝不触碰页面本身的滚动。 */
   var links = $$('.side a, .pills a');
-  var heads = [];
+  var pillBar = $('.pills');
+  var spy = [], above = {}, curId = null, footerSeen = false, spyIO = null, spyLine = 142, spyTimer;
   links.forEach(function (a) {
-    var id = a.getAttribute('href').slice(1), el = document.getElementById(id);
-    if (el) heads.push({ id: id, el: el });
+    var id = a.getAttribute('href').slice(1);
+    if (spy.some(function (x) { return x.id === id; })) return;
+    var sec = document.getElementById(id), h = sec && sec.querySelector('h2, h3');
+    if (h) spy.push({ id: id, sec: sec, h: h });
   });
-  var ticking = false;
-  function onScroll() {
-    if (ticking) return; ticking = true;
-    requestAnimationFrame(function () {
-      ticking = false;
-      var line = (parseFloat(getComputedStyle(root).getPropertyValue('--top')) || 52) + 90, cur = null;
-      heads.forEach(function (h) { if (!h.el.hidden && h.el.getBoundingClientRect().top <= line) cur = h.id; });
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
-        var last = heads.filter(function (h) { return h.id.charAt(0) === 's' && !h.el.hidden; }).pop(); if (last) cur = last.id;
-      }
-      var inGroup = !!cur && cur.charAt(0) === 'g';
-      links.forEach(function (a) {
-        var id = a.getAttribute('href').slice(1), inPills = !!a.closest('.pills');
-        var on = id === cur || (inPills && id === 's4' && inGroup);
-        a.setAttribute('aria-current', on ? 'true' : 'false');
-        if (on && inPills) a.scrollIntoView({ inline: 'center', block: 'nearest' });
-      });
+  function spyRefresh() {
+    var cur = null;
+    spy.forEach(function (x) { if (above[x.id] && !x.sec.closest('[hidden]')) cur = x.id; });
+    if (footerSeen) cur = 's5';
+    if (cur === curId) return;
+    curId = cur;
+    var inGroup = !!cur && cur.charAt(0) === 'g';
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1), inPills = !!a.closest('.pills');
+      a.setAttribute('aria-current', (id === cur || (inPills && id === 's4' && inGroup)) ? 'true' : 'false');
     });
+    var act = pillBar && pillBar.offsetParent !== null && $('a[aria-current="true"]', pillBar);
+    if (act) pillBar.scrollTo({ left: act.offsetLeft - (pillBar.clientWidth - act.offsetWidth) / 2, behavior: 'smooth' });
   }
-  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  /* 兜底：整页跳转（点目录、深链）时观察器可能收不到通知，滚动停下后按实际位置量一次 */
+  function spyMeasure() {
+    spy.forEach(function (x) { above[x.id] = !x.sec.closest('[hidden]') && x.h.getBoundingClientRect().bottom <= spyLine; });
+    footerSeen = $('.foot').getBoundingClientRect().top < window.innerHeight;
+    spyRefresh();
+  }
+  window.addEventListener('scroll', function () { clearTimeout(spyTimer); spyTimer = setTimeout(spyMeasure, 120); }, { passive: true });
+  function buildSpy() {
+    if (!('IntersectionObserver' in window)) return;
+    if (spyIO) spyIO.disconnect();
+    var line = spyLine = (parseFloat(getComputedStyle(root).getPropertyValue('--top')) || 52) + 90;
+    spyIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.target.classList.contains('foot')) { footerSeen = e.isIntersecting; return; }
+        var x = spy.filter(function (y) { return y.h === e.target; })[0]; if (!x) return;
+        above[x.id] = !e.isIntersecting && e.boundingClientRect.top < line;
+      });
+      spyRefresh();
+    }, { rootMargin: '-' + line + 'px 0px 0px 0px' });
+    spy.forEach(function (x) { spyIO.observe(x.h); });
+    spyIO.observe($('.foot'));
+  }
+  buildSpy(); spyMeasure();
+  if (window.matchMedia) window.matchMedia('(max-width: 1099px)').addEventListener('change', function () { curId = undefined; buildSpy(); });
 
   /* ── 深链：#n157 ── */
   function goHash() {
